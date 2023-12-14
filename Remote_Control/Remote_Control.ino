@@ -1,6 +1,6 @@
 #include<SoftwareSerial.h>
 
-SoftwareSerial btSerial(2, 3); // RX | TX
+SoftwareSerial btSerial(2, 3); // tx e rx
 
 struct PacketData 
 {
@@ -16,11 +16,7 @@ void setup()
   btSerial.begin(38400);   
 }
 
-//This function is used to map 0-1023 joystick value to 0-254. hence 127 is the center value which we send.
-//It also adjust the deadband in joystick.
-//Jotstick values range from 0-1023. But its center value is not always 511. It is little different.
-//So we need to add some deadband to center value. in our case 500-530. Any value in this deadband range is mapped to center 127.
-int mapAndAdjustJoystickDeadBandValues(int value, bool reverse)
+int joystick(int value, bool reverse)
 {
   if (value >= 530)
   {
@@ -44,17 +40,17 @@ int mapAndAdjustJoystickDeadBandValues(int value, bool reverse)
 
 void loop()
 {
-  data.lxAxisValue    = mapAndAdjustJoystickDeadBandValues(analogRead(A0), false);
-  data.lyAxisValue    = mapAndAdjustJoystickDeadBandValues(analogRead(A1), false);
-  data.rxAxisValue    = mapAndAdjustJoystickDeadBandValues(analogRead(A2), false);
-  data.ryAxisValue    = mapAndAdjustJoystickDeadBandValues(analogRead(A3), false);
+  data.lxAxisValue = joystick(analogRead(A0), false);
+  data.lyAxisValue = joystick(analogRead(A1), false);
+  data.rxAxisValue = joystick(analogRead(A2), false);
+  data.ryAxisValue = joystick(analogRead(A3), false);
 
   String dataString;
   dataString = dataString 
-               + data.lxAxisValue + "," 
-               + data.lyAxisValue + ","  
-               + data.rxAxisValue + ","  
-               + data.ryAxisValue + "\n";
+  + data.lxAxisValue + "," 
+  + data.lyAxisValue + ","  
+  + data.rxAxisValue + ","  
+  + data.ryAxisValue + "\n";
   
   btSerial.print(dataString);
   delay(10);
